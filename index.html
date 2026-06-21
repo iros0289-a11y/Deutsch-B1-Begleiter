@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0f766e">
+    <meta name="description" content="PWA zum Deutschlernen fuer den Integrationskurs, DTZ B1 und Leben in Deutschland.">
+    <title>Deutsch B1 Begleiter</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./assets/icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Integrationskurs Deutsch</p>
+          <h1>Deutsch B1 Begleiter</h1>
+        </div>
+        <button id="installBtn" class="ghost hidden" type="button">Installieren / Anleitung</button>
+      </header>
+
+      <nav id="nav" class="nav" aria-label="Hauptbereiche"></nav>
+
+      <main id="app" class="content" tabindex="-1"></main>
+    </div>
+
+    <template id="modalTemplate">
+      <div class="modal-backdrop">
+        <section class="modal" role="dialog" aria-modal="true">
+          <button class="modal-close" type="button" aria-label="Schliessen">x</button>
+          <div class="modal-body"></div>
+        </section>
+      </div>
+    </template>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
