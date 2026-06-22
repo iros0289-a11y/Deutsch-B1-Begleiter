@@ -1,9 +1,11 @@
-const CACHE_NAME = "deutsch-b1-begleiter-v4";
+const CACHE_NAME = "deutsch-b1-begleiter-20260622-v5";
 const CORE_ASSETS = [
   "./",
-  "./index.html",
-  "./styles.css",
-  "./manifest.webmanifest",
+  "./?app=deutsch-b1-begleiter-20260622",
+  "./index.html?app=deutsch-b1-begleiter-20260622",
+  "./styles.css?v=20260622",
+  "./app.js?v=20260622",
+  "./manifest.webmanifest?v=20260622",
   "./service-worker.js",
   "./icon.svg",
   "./icon-192.png",
@@ -28,6 +30,7 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200) return response;
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return response;

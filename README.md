@@ -31,6 +31,13 @@ Der Button "Installieren / Anleitung" versucht in kompatiblen Browsern den echte
 
 Wichtig: Der Codex-In-App-Browser und manche eingebettete Browser koennen PWAs nicht direkt installieren. Testen Sie die Installation auf Android am besten in Chrome oder Edge mit einem oeffentlichen HTTPS-Link.
 
+Wenn Android meldet, dass eine alte Version installiert ist oder Datenschutzfunktionen fehlen koennten:
+
+1. Die alte App "Deutsch B1" vom Android-Startbildschirm entfernen/deinstallieren.
+2. In Chrome die Seite neu oeffnen: `https://iros0289-a11y.github.io/Deutsch-B1-Begleiter/?app=deutsch-b1-begleiter-20260622`
+3. Chrome-Menue oeffnen und "App installieren" oder "Zum Startbildschirm hinzufuegen" waehlen.
+4. Falls die Meldung weiter erscheint, Chrome aktualisieren. Diese App ist eine PWA, keine APK-Datei.
+
 ## Wichtiger Hinweis
 
 Die App bildet die offizielle DTZ-Struktur pruefungsnah nach und enthaelt einen LiD-Trainingskatalog mit 310 Fragen. Der offizielle BAMF-Katalog kann ergaenzend im Bereich "Leben in Deutschland" geoeffnet werden. Fuer produktive Nutzung sollte der amtliche Fragenkatalog als JSON/CSV-Datenblock importiert und regelmaessig geprueft werden.
