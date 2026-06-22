@@ -1,11 +1,11 @@
-const CACHE_NAME = "deutsch-b1-begleiter-20260622-dtz-fix-v7";
+const CACHE_NAME = "deutsch-b1-begleiter-20260622-dtz-schema-v8";
 const CORE_ASSETS = [
   "./",
-  "./?app=deutsch-b1-begleiter-20260622",
-  "./index.html?app=deutsch-b1-begleiter-20260622",
-  "./styles.css?v=20260622dtzfix",
-  "./app.js?v=20260622dtzfix",
-  "./manifest.webmanifest?v=20260622dtzfix",
+  "./?app=deutsch-b1-begleiter-20260622-dtz-schema",
+  "./index.html?app=deutsch-b1-begleiter-20260622-dtz-schema",
+  "./styles.css?v=20260622dtzschema",
+  "./app.js?v=20260622dtzschema",
+  "./manifest.webmanifest?v=20260622dtzschema",
   "./service-worker.js",
   "./icon.svg",
   "./icon-192.png",

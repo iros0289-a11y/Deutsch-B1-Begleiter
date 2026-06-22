@@ -20,7 +20,7 @@ const officialSources = [
   },
   {
     label: "g.a.s.t.: Der DTZ auf einen Blick",
-    url: "https://www.gast.de/de/forschung-entwicklung/entwicklung/auftraege/deutsch-test-fuer-zuwanderer-dtz/der-dtz-auf-einen-blick",
+    url: "https://www.gast.de/de/forschung-entwicklung/entwicklung/auftraege/deutsch-test-für-zuwanderer-dtz/der-dtz-auf-einen-blick",
   },
   {
     label: "BAMF Online-Testcenter: Einbürgerungstest/Leben in Deutschland",
@@ -1501,7 +1501,11 @@ function bindExams() {
     button.addEventListener("click", stopSpeech);
   });
   document.querySelector("#playAllListening")?.addEventListener("click", async () => {
-    speakQueue(state.exam.listening.map((item) => item.audio));
+    const audios = state.exam.listening
+      .map((item) => item.audio)
+      .filter(Boolean)
+      .filter((audio, index, all) => all.indexOf(audio) === index);
+    speakQueue(audios);
   });
   document.querySelector("#stopExamAudio")?.addEventListener("click", stopSpeech);
   document.querySelector("#examForm")?.addEventListener("submit", (event) => {
@@ -1550,6 +1554,612 @@ function gradeExam(formData) {
   `);
   render();
 }
+
+const dtzListenPart1Pool = [
+  {
+    audio: "Guten Tag Frau Schmidt. Die Schule schickt Ihnen die Unterlagen für die Anmeldung per Post. Bitte warten Sie auf den Brief und bringen Sie ihn nächste Woche mit.",
+    prompt: "Was soll Frau Schmidt machen?",
+    options: ["An die Schule schreiben.", "Am Samstag in die Schule kommen.", "Auf einen Brief warten."],
+    answer: "Auf einen Brief warten.",
+  },
+  {
+    audio: "Hallo Svetlana, hier ist Anna. Der Film beginnt nicht um halb neun, sondern schon um 20 Uhr. Bitte sei pünktlich am Kino.",
+    prompt: "Wann soll Svetlana am Kino sein?",
+    options: ["Um 20 Uhr.", "Um kurz vor halb neun.", "Um 20 Uhr 30."],
+    answer: "Um 20 Uhr.",
+  },
+  {
+    audio: "Das Bürgeramt hat diese Woche auch am Samstagmittag geöffnet. Sie können ohne Termin zwischen 10 und 13 Uhr kommen.",
+    prompt: "Wann hat das Bürgeramt geöffnet?",
+    options: ["Täglich bis 18 Uhr.", "Auch samstagmittags.", "Auch samstagabends."],
+    answer: "Auch samstagmittags.",
+  },
+  {
+    audio: "Wenn Sie dringend zum Orthopäden müssen, rufen Sie bitte zuerst die andere Nummer auf dem Rezept an. Dort bekommen Sie schneller einen Termin.",
+    prompt: "Sie müssen dringend zum Orthopäden. Was sollen Sie tun?",
+    options: ["Am 1. März vorbeikommen.", "Am 1. März anrufen.", "Eine andere Nummer anrufen."],
+    answer: "Eine andere Nummer anrufen.",
+  },
+  {
+    audio: "Die Straßenbahn 78 fährt heute nicht bis Rosengarten. Bitte steigen Sie an der Haltestelle Friedrichring um.",
+    prompt: "Sie wollen zum Rosengarten. Was müssen Sie tun?",
+    options: ["An der Haltestelle Friedrichring umsteigen.", "Mit der Straßenbahn 78 weiterfahren.", "Mit der U-Bahn-Linie 1 oder 2 fahren."],
+    answer: "An der Haltestelle Friedrichring umsteigen.",
+  },
+  {
+    audio: "Praxis Dr. Weber, guten Tag. Wir müssen Ihren Termin leider verschieben. Die Ärztin ist krank. Bitte rufen Sie uns zurück.",
+    prompt: "Wer ruft an?",
+    options: ["Eine Apotheke.", "Eine Arztpraxis.", "Eine Versicherung."],
+    answer: "Eine Arztpraxis.",
+  },
+];
+
+const dtzListenPart2Pool = [
+  {
+    audio: "Verkehrsmeldung: Auf der A 5 liegen Gegenstände auf der Fahrbahn. Bitte fahren Sie langsam und benutzen Sie nach Möglichkeit eine andere Strecke.",
+    prompt: "Wo liegen Gegenstände auf der Straße?",
+    options: ["Auf der A 3.", "Auf der A 5.", "Auf der A 45."],
+    answer: "Auf der A 5.",
+  },
+  {
+    audio: "Das Wetter: Am Sonntag wird es deutlich wärmer. Regen ist erst am Abend möglich. Der Wind bleibt schwach.",
+    prompt: "Wie wird das Wetter am Sonntag?",
+    options: ["Es wird wärmer.", "Es gibt Regen.", "Es wird sehr windig."],
+    answer: "Es wird wärmer.",
+  },
+  {
+    audio: "Nach den Nachrichten hören Sie Tipps für Autobesitzer: Wie bereitet man das Auto auf den Winter vor?",
+    prompt: "Was hören Sie?",
+    options: ["Verkehrsmeldungen.", "Die Nachrichten.", "Tipps für Autobesitzer."],
+    answer: "Tipps für Autobesitzer.",
+  },
+  {
+    audio: "Der Krimi im Abendprogramm fällt heute aus. Einen neuen Sendetermin gibt es noch nicht.",
+    prompt: "Wann kann man den Krimi sehen?",
+    options: ["Heute um 20.15 Uhr.", "Es gibt noch keinen neuen Termin.", "Morgen."],
+    answer: "Es gibt noch keinen neuen Termin.",
+  },
+  {
+    audio: "Wegen eines Brandes bittet die Feuerwehr alle Bewohner des Stadtteils: Bitte stören Sie die Löscharbeiten nicht und bleiben Sie hinter den Absperrungen.",
+    prompt: "Die Bewohner des Stadtteils sollen",
+    options: ["die Feuerwehr anrufen.", "die Löscharbeiten nicht stören.", "ihre Wohnungen verlassen."],
+    answer: "die Löscharbeiten nicht stören.",
+  },
+  {
+    audio: "Am Sonntag sendet Radio West ein Programm für Kinder. Danach folgen internationale Kurzfilme und am Abend ein Musikprogramm.",
+    prompt: "Am Sonntag gibt es",
+    options: ["ein Musikprogramm.", "ein Programm für Kinder.", "internationale Kurzfilme."],
+    answer: "ein Programm für Kinder.",
+  },
+  {
+    audio: "Erwachsene sollten Medinox nur einnehmen, wenn die Ärztin oder der Arzt zugestimmt hat. Lesen Sie die Packungsbeilage genau.",
+    prompt: "Wie sollen Erwachsene Medinox einnehmen?",
+    options: ["Dreimal am Tag.", "Mit Wasser.", "Nur wenn die Ärztin oder der Arzt zustimmt."],
+    answer: "Nur wenn die Ärztin oder der Arzt zustimmt.",
+  },
+  {
+    audio: "In der Lichtburg läuft am Wochenende ein Kinderfilm. Der Krimi kommt erst nächste Woche wieder ins Programm.",
+    prompt: "Was läuft in der Lichtburg?",
+    options: ["Ein Kinderfilm.", "Ein Krimi.", "Eine Komödie."],
+    answer: "Ein Kinderfilm.",
+  },
+];
+
+const dtzListenPart3Pool = [
+  {
+    audio: "Kundin: Guten Tag, ich habe mein Fahrrad letzte Woche reparieren lassen. Jetzt funktioniert die Bremse wieder nicht. Verkäufer: Das tut mir leid. Wir können Ihnen für zwei Tage ein Ersatzrad geben und die Reparatur sofort prüfen.",
+    tfPrompt: "Die Kundin beschwert sich über eine Reparatur.",
+    tfAnswer: "richtig",
+    prompt: "Was bietet der Verkäufer an?",
+    options: ["Ein neues Fahrrad.", "Ein Ersatzrad.", "Geld für das alte Rad."],
+    answer: "Ein Ersatzrad.",
+  },
+  {
+    audio: "Mann: Frau Scholz, ich fahre morgen für eine Woche weg. Könnten Sie bitte nach meinen Blumen sehen? Die Post bleibt im Briefkasten, das ist kein Problem. Frau Scholz: Ja, natürlich.",
+    tfPrompt: "Der Sprecher will verreisen.",
+    tfAnswer: "richtig",
+    prompt: "Worum bittet der Mann Frau Scholz?",
+    options: ["Sie soll ihn im Urlaub anrufen.", "Sie soll nach den Blumen sehen.", "Sie soll wichtige Post an seine Adresse schicken."],
+    answer: "Sie soll nach den Blumen sehen.",
+  },
+  {
+    audio: "Patientin: Guten Tag, ich habe ein Rezept für dieses Medikament. Apothekerin: Das Medikament ist heute leider nicht da, aber wir bestellen es. Es kostet Sie nichts, die Krankenkasse bezahlt es.",
+    tfPrompt: "Sie hören ein Gespräch zwischen einer Patientin und einer Apothekerin.",
+    tfAnswer: "richtig",
+    prompt: "Was ist richtig?",
+    options: ["Das Medikament kostet nichts.", "Das Medikament kann man nicht mehr bekommen.", "Das Medikament ist rezeptfrei."],
+    answer: "Das Medikament kostet nichts.",
+  },
+  {
+    audio: "Herr Braun: Kommst du morgen zur Versammlung? Herr Martin: Ich weiss es noch nicht genau. Eigentlich habe ich Urlaub, aber vielleicht muss ich am Nachmittag arbeiten.",
+    tfPrompt: "Herr Braun und Herr Martin sind Kollegen.",
+    tfAnswer: "richtig",
+    prompt: "Kommt Herr Braun zur Versammlung?",
+    options: ["Nein, er muss arbeiten.", "Nein, er hat Urlaub.", "Er weiss es noch nicht genau."],
+    answer: "Er weiss es noch nicht genau.",
+  },
+  {
+    audio: "Frau: Guten Tag, ich brauche die Tabletten für meinen Vater. Apotheker: Bitte geben Sie ihm mindestens drei Tabletten am Tag, aber nur nach dem Essen. Frau: Gut, ich schreibe es auf.",
+    tfPrompt: "Die Frau ist Ärztin.",
+    tfAnswer: "falsch",
+    prompt: "Die Frau sagt dem Mann, dass",
+    options: ["die Tabletten lange wirken.", "er mindestens drei Tabletten nehmen soll.", "er sofort zum Arzt gehen soll."],
+    answer: "er mindestens drei Tabletten nehmen soll.",
+  },
+  {
+    audio: "Maria: Meine neue Chefin ist oft arrogant. Früher war sie selbst keine Krankenschwester, trotzdem erklärt sie uns alles sehr streng. Freundin: Das klingt schwer.",
+    tfPrompt: "Maria ist unglücklich in ihrem neuen Job.",
+    tfAnswer: "richtig",
+    prompt: "Maria sagt, dass ihre neue Chefin",
+    options: ["jung ist.", "oft arrogant ist.", "selbst keine Krankenschwester war."],
+    answer: "oft arrogant ist.",
+  },
+];
+
+const dtzListenPart4Themes = [
+  {
+    topic: "Sonntags einkaufen",
+    options: [
+      "a: Es gibt schon viele Geschäfte, die sonntags offen haben.",
+      "b: Im Ausland sind die Geschäfte sonntags geschlossen.",
+      "c: In der Zukunft werden die Geschäfte länger offen sein.",
+      "d: Man kann sonntags seine Freizeit nicht mehr zusammen verbringen.",
+      "e: Schon jetzt haben die Leute zu viel Hektik.",
+      "f: Sonntags sollten auch Banken offen haben.",
+    ],
+    statements: [
+      { audio: "Ich finde, der Sonntag sollte ruhig bleiben. Die Menschen haben schon in der Woche genug Hektik.", answer: "e: Schon jetzt haben die Leute zu viel Hektik." },
+      { audio: "Wenn alles auch sonntags offen ist, verbringen Familien noch weniger Zeit zusammen.", answer: "d: Man kann sonntags seine Freizeit nicht mehr zusammen verbringen." },
+      { audio: "Ich glaube, dass die Geschäfte in einigen Jahren noch länger offen sein werden.", answer: "c: In der Zukunft werden die Geschäfte länger offen sein." },
+    ],
+  },
+  {
+    topic: "Kinder und Fernsehen",
+    options: [
+      "a: Die Sprecherin hat ihren Fernseher verkauft, nachdem sie ein Kind bekam.",
+      "b: Wichtig sind eindeutige Regeln beim Fernsehen.",
+      "c: Es hängt vom Alter ab, wie viel Kinder fernsehen sollten.",
+      "d: Man soll die Kinder nicht allein fernsehen lassen.",
+      "e: Ohne Fernsehen würde es keine Probleme mehr geben.",
+      "f: Eltern müssen ihr eigenes Fernsehverhalten ändern.",
+    ],
+    statements: [
+      { audio: "Bei uns gibt es klare Zeiten. Meine Kinder wissen genau, wann der Fernseher ausgemacht wird.", answer: "b: Wichtig sind eindeutige Regeln beim Fernsehen." },
+      { audio: "Kleine Kinder brauchen Begleitung. Sie sollten nicht allein vor dem Fernseher sitzen.", answer: "d: Man soll die Kinder nicht allein fernsehen lassen." },
+      { audio: "Viele Eltern sagen Nein, aber sie schauen selbst den ganzen Abend. Das muss sich zuerst ändern.", answer: "f: Eltern müssen ihr eigenes Fernsehverhalten ändern." },
+    ],
+  },
+];
+
+const dtzWritingSets = [
+  {
+    aTitle: "Aufgabe A: Erste-Hilfe-Kurs",
+    aSituation: "Sie möchten einen Erste-Hilfe-Kurs machen. Sie haben noch Fragen. Schreiben Sie eine E-Mail an Herrn Schmidt vom Weiterbildungszentrum.",
+    aPoints: ["Warum Sie einen Erste-Hilfe-Kurs machen möchten", "Ihre Erfahrungen", "Dauer und Termine des Kurses", "Kosten"],
+    bTitle: "Aufgabe B: Treppenhaus im Mietshaus",
+    bSituation: "Sie wohnen in einem Mietshaus. Alle Mieter müssen das Treppenhaus putzen, aber keiner von Ihren Nachbarn macht es. Schreiben Sie Ihrem Vermieter, Herrn Lehmann, einen Brief.",
+    bPoints: ["Grund für Ihr Schreiben", "Wie Sie versucht haben, das Problem selbst zu lösen", "Weitere Probleme im Haus", "Was der Vermieter tun soll"],
+  },
+  {
+    aTitle: "Aufgabe A: Hotel in den Bergen",
+    aSituation: "Sie möchten in die Berge fahren. Im Internet haben Sie ein Hotel gefunden. Schreiben Sie eine E-Mail an das Hotel.",
+    aPoints: ["Grund für Ihr Schreiben", "Wann Sie fahren möchten und mit wem", "Wie viele Nächte Sie bleiben möchten", "Essen oder Kosten"],
+    bTitle: "Aufgabe B: Elternabend und Ausflug",
+    bSituation: "Morgen findet ein Elternabend in der Schule Ihres Kindes statt, aber Sie können nicht kommen. Nächste Woche macht die Klasse einen Ausflug. Schreiben Sie dem Lehrer, Herrn Traut, eine E-Mail.",
+    bPoints: ["Grund für Ihr Schreiben", "Warum Sie nicht kommen können", "Fragen zum Ausflug", "Bitte um Rückmeldung"],
+  },
+  {
+    aTitle: "Aufgabe A: Sprachkurs wechseln",
+    aSituation: "Ihr Deutschkurs ist am Abend. Sie arbeiten jetzt später und können nicht mehr kommen. Schreiben Sie an die Kursleitung.",
+    aPoints: ["Grund für Ihr Schreiben", "Ihre neue Arbeitszeit", "Bitte um Wechsel in einen Vormittagskurs", "Frage nach freien Plätzen"],
+    bTitle: "Aufgabe B: Lärm im Haus",
+    bSituation: "In Ihrem Haus ist es abends sehr laut. Sie haben schon mit den Nachbarn gesprochen, aber es ist nicht besser geworden. Schreiben Sie an die Hausverwaltung.",
+    bPoints: ["Grund für Ihr Schreiben", "Wann es laut ist", "Was Sie schon gemacht haben", "Was die Hausverwaltung tun soll"],
+  },
+];
+
+const dtzPlanningTasks = [
+  {
+    title: "Gemeinsam etwas planen: Party",
+    situation: "Sie haben im Urlaub nette Bekannte kennengelernt. Vor der Abreise möchten Sie eine Abschiedsparty planen.",
+    notes: ["Wann?", "Wo?", "Essen", "Getränke", "Wer bezahlt wofür?", "...?"],
+  },
+  {
+    title: "Gemeinsam etwas planen: Ausflug",
+    situation: "Sie möchten zusammen mit Ihrem Deutschkurs am Wochenende einen Ausflug machen. Sie beide organisieren die Wanderung.",
+    notes: ["Wohin?", "Was besichtigen?", "Übernachten?", "Essen?", "Wer soll kommen?", "...?"],
+  },
+  {
+    title: "Gemeinsam etwas planen: Aufzug kaputt",
+    situation: "Sie wohnen im selben Mietshaus. Der Aufzug ist schon wieder kaputt. Sie möchten etwas unternehmen.",
+    notes: ["Wem Bescheid sagen?", "Anrufen oder schreiben?", "Was sagen oder schreiben?", "Andere Nachbarn informieren?", "Was tun, wenn nichts passiert?", "...?"],
+  },
+  {
+    title: "Gemeinsam etwas planen: Freundin besuchen",
+    situation: "Eine gemeinsame Freundin ist in eine neue Stadt gezogen. Sie möchten die Freundin besuchen und die Stadt besichtigen.",
+    notes: ["Wie fahren?", "Wann und wie lange?", "Wo übernachten?", "Was machen?", "Geschenk mitbringen?", "...?"],
+  },
+];
+
+function dtzPick(list, examNumber, count, offset = 0) {
+  return Array.from({ length: count }, (_, index) => list[(examNumber * 5 + offset + index) % list.length]);
+}
+
+function dtzQuestion(item, extra = {}) {
+  return {
+    ...item,
+    ...extra,
+    options: uniqueOptions(item.options || extra.options || []),
+  };
+}
+
+function buildDtzListeningSections(examNumber) {
+  const part1 = dtzPick(dtzListenPart1Pool, examNumber, 4).map((item) => dtzQuestion(item, { kind: "listen-mc", part: "Hören Teil 1" }));
+  const part2 = dtzPick(dtzListenPart2Pool, examNumber, 5, 2).map((item) => dtzQuestion(item, { kind: "listen-mc", part: "Hören Teil 2" }));
+  const conversations = dtzPick(dtzListenPart3Pool, examNumber, 4, 4);
+  const part3 = conversations.flatMap((item) => [
+    {
+      kind: "listen-tf",
+      part: "Hören Teil 3",
+      audio: item.audio,
+      prompt: item.tfPrompt,
+      options: ["richtig", "falsch"],
+      answer: item.tfAnswer,
+    },
+    dtzQuestion(item, { kind: "listen-mc", part: "Hören Teil 3" }),
+  ]);
+  const theme = dtzListenPart4Themes[examNumber % dtzListenPart4Themes.length];
+  const part4 = theme.statements.map((item) => ({
+    kind: "listen-match",
+    part: "Hören Teil 4",
+    audio: item.audio,
+    prompt: "Welche Aussage passt?",
+    options: theme.options,
+    answer: item.answer,
+  }));
+  return [
+    {
+      title: "Hören Teil 1",
+      time: "25 Minuten Hören",
+      instruction: "Sie hören vier Ansagen. Zu jeder Ansage gibt es eine Aufgabe. Welche Lösung a, b oder c passt am besten?",
+      questions: part1,
+    },
+    {
+      title: "Hören Teil 2",
+      time: "25 Minuten Hören",
+      instruction: "Sie hören fünf Ansagen aus dem Radio. Zu jeder Ansage gibt es eine Aufgabe.",
+      questions: part2,
+    },
+    {
+      title: "Hören Teil 3",
+      time: "25 Minuten Hören",
+      instruction: "Sie hören vier Gespräche. Zu jedem Gespräch gibt es zwei Aufgaben: richtig/falsch und a, b oder c.",
+      questions: part3,
+    },
+    {
+      title: "Hören Teil 4",
+      time: "25 Minuten Hören",
+      instruction: `Sie hören Aussagen zu einem Thema: ${theme.topic}. Welche der Sätze a-f passt zu den Aussagen?`,
+      sourceHtml: `<div class="exam-source compact">${theme.options.map((option) => `<p>${escapeHtml(option)}</p>`).join("")}</div>`,
+      questions: part4,
+    },
+  ];
+}
+
+function buildDtzReadingSections(examNumber) {
+  const guideHtml = `
+    <div class="exam-source">
+      <h4>Rathaus - Zentralwegweiser</h4>
+      <p><strong>4. OG Umweltamt</strong><br>Mülltonnen An- und Abmeldung / Sperrmüll / Sondermüll / Altbatterien<br><strong>Gesundheitsamt</strong><br>Beratung / Ärzte und Krankenhäuser in der Region</p>
+      <p><strong>3. OG Standesamt</strong><br>Eheschließung / Geburtsurkunde / Namensführung / Scheidung</p>
+      <p><strong>2. OG Sozialamt</strong><br>Soziale Hilfe für Ältere, Geflüchtete und Menschen mit Behinderungen / Mietzuschuss<br><strong>Wohnungsamt</strong><br>Wohngeld / Wohnungsvermittlung / Mietspiegel</p>
+      <p><strong>1. OG Jugendamt</strong><br>Kindertagesstätten / Kindergärten / Pflegekinderwesen<br><strong>Verkehrsamt</strong><br>Führerscheinstelle / Kfz-Zulassung / Parkausweise</p>
+      <p><strong>EG Bürgeramt</strong><br>Bürgerservice / Beglaubigungen / Führungszeugnisse / Passangelegenheiten / Kopierer / Fundbüro<br><strong>Ausländeramt</strong><br>Visa / Staatsangehörigkeit / Namensrecht</p>
+    </div>
+  `;
+  const part1 = [
+    ["Ihre Großmutter kann nicht mehr alleine kochen und putzen.", ["2. OG", "4. OG", "anderes Stockwerk"], "2. OG"],
+    ["Sie suchen Informationen über Krankenhäuser in Ihrer Gegend.", ["2. OG", "3. OG", "anderes Stockwerk"], "anderes Stockwerk"],
+    ["Sie brauchen einen neuen Führerschein.", ["EG", "1. OG", "anderes Stockwerk"], "1. OG"],
+    ["Sie möchten ein wichtiges Dokument kopieren.", ["EG", "2. OG", "anderes Stockwerk"], "EG"],
+    ["Sie brauchen eine größere Tonne für Ihren Abfall.", ["EG", "4. OG", "anderes Stockwerk"], "4. OG"],
+  ].map(([prompt, options, answer]) => ({ kind: "reading-mc", part: "Lesen Teil 1", prompt, options, answer }));
+
+  const ads = [
+    ["a", "Fahrlehrer/in gesucht", "Ausbildung für Klasse BE. Mindestalter 21 Jahre, PKW-Führerschein erforderlich."],
+    ["b", "Babysitterkurs", "Kurs für Jugendliche und Erwachsene: Pflege, Ernährung, Notfälle und Spielvorschläge."],
+    ["c", "Webentwickler/in", "Ausbildung im Fernunterricht. Realschulabschluss und PC-Grundkenntnisse erforderlich."],
+    ["d", "Zeitungsausträger/in", "Nebenjob am Samstagvormittag. Guter Verdienst, frühes Aufstehen nötig."],
+    ["e", "Erzieher/in in Teilzeit", "Betreuung und Erziehung der Kinder. Mehrjährige Berufserfahrung erwünscht."],
+    ["f", "Aushilfe in Bäckerei", "Täglich von 15 bis 18 Uhr. Freundliche Mitarbeit im Verkauf."],
+    ["g", "Bildungsgutschein", "Finanzielle Hilfe für Weiterbildung durch die Agentur für Arbeit."],
+    ["h", "Schulabschluss nachholen", "Abendkurs für Erwachsene: Haupt-, Real- oder Fachhochschulreife."],
+  ];
+  const adHtml = `<div class="exam-ad-grid">${ads.map(([letter, title, text]) => `<article><strong>${letter} ${escapeHtml(title)}</strong><p>${escapeHtml(text)}</p></article>`).join("")}</div>`;
+  const part2 = [
+    ["Sie möchten in Ihrer Freizeit Kinder betreuen.", ["b", "e", "x"], "b"],
+    ["Sie möchten an einer Hochschule studieren, haben aber nur einen Realschulabschluss.", ["c", "h", "x"], "h"],
+    ["Sie suchen einen Nebenjob am Wochenende.", ["d", "f", "x"], "d"],
+    ["Sie möchten den Führerschein machen.", ["a", "g", "x"], "x"],
+    ["Sie möchten eine Ausbildung von zu Hause aus machen.", ["c", "h", "x"], "c"],
+  ].map(([prompt, options, answer]) => ({ kind: "reading-match", part: "Lesen Teil 2", prompt, options, answer }));
+
+  const readingTextsForPart3 = [
+    {
+      title: "Marienstraßen-Fest in Neustadt",
+      text: "Am Sonntag findet das Marienstraßen-Fest statt. Die Geschäfte in der Innenstadt sind geöffnet. Wegen vieler Besucher fährt die Buslinie 306 zwischen 10 und 19 Uhr alle 15 Minuten. Besucherinnen und Besucher sollen möglichst mit öffentlichen Verkehrsmitteln kommen.",
+      tasks: [
+        { prompt: "Am Sonntag fährt die Buslinie 306 öfter als sonst.", options: ["richtig", "falsch"], answer: "richtig" },
+        { prompt: "Besucherinnen und Besucher sollen", options: ["ihr Auto in der Innenstadt parken.", "mit öffentlichen Verkehrsmitteln kommen.", "nur die Sonderbusse benutzen."], answer: "mit öffentlichen Verkehrsmitteln kommen." },
+      ],
+    },
+    {
+      title: "E-Mail von NetCom",
+      text: "Liebe Frau Kim, vielen Dank für Ihren Auftrag. Die Auftragsbestätigung erhalten Sie in den nächsten Tagen per Brief. Unser Techniker kommt am 27.07. zwischen 10:30 und 13:30 Uhr. Bitte bestätigen Sie den Termin über den Link in dieser E-Mail.",
+      tasks: [
+        { prompt: "Frau Kim bekommt einen neuen Internet-Anschluss.", options: ["richtig", "falsch"], answer: "richtig" },
+        { prompt: "Wie soll Frau Kim den Termin bestätigen?", options: ["auf den Link klicken.", "den Online-Service nutzen.", "einen Brief schreiben."], answer: "auf den Link klicken." },
+      ],
+    },
+    {
+      title: "Einladung zum Klassenfest",
+      text: "Liebe Familie Ivanov, nächsten Monat planen wir ein Klassenfest. Alle Familien sind herzlich eingeladen. Die Teilnahme ist kostenlos, aber alle sollen etwas zu essen oder zu trinken mitbringen. Bitte sagen Sie Bescheid, ob Sie teilnehmen.",
+      tasks: [
+        { prompt: "Frau Trautmann ist die Lehrerin von Denis.", options: ["richtig", "falsch"], answer: "richtig" },
+        { prompt: "Familie Ivanov", options: ["darf zu einer Feier kommen.", "muss in der Schule anrufen.", "soll für Essen bezahlen."], answer: "darf zu einer Feier kommen." },
+      ],
+    },
+  ];
+  const part3 = readingTextsForPart3.flatMap((text) => text.tasks.map((task, index) => ({
+    kind: index === 0 ? "reading-tf" : "reading-mc",
+    part: "Lesen Teil 3",
+    sourceTitle: text.title,
+    sourceText: text.text,
+    ...task,
+  })));
+
+  const part4Text = "Die Mittagsbetreuung an der Grundschule findet während der Schulzeit von Montag bis Freitag von 11 bis 14 Uhr statt. Die Gebühren richten sich nach den Besuchstagen. Bei zwei Kindern gibt es 15 Prozent Ermäßigung, bei drei Kindern 50 Prozent. Die Kinder spielen, basteln und lernen Regeln für das Zusammenleben. Die Mittagsbetreuung ist keine Hausaufgabenbetreuung.";
+  const part4SourceHtml = `<div class="exam-source"><h4>Mittagsbetreuung an der Grundschule - Elterninformation</h4><p>${escapeHtml(part4Text)}</p></div>`;
+  const part4 = [
+    { prompt: "Die Mittagsbetreuung ist am Wochenende geschlossen.", answer: "richtig" },
+    { prompt: "Bei zwei Kindern bezahlt man die Hälfte.", answer: "falsch" },
+    { prompt: "Die Kinder lernen Regeln für das Zusammenleben.", answer: "richtig" },
+  ].map((task) => ({ kind: "reading-tf", part: "Lesen Teil 4", options: ["richtig", "falsch"], ...task }));
+
+  const clozeText = `Hotel "Zum Löwen"
+Königsberger Str. 5
+50876 Köln
+
+Beschwerde
+
+Sehr (0) Damen und Herren,
+
+(40) Frau und ich haben am letzten Wochenende Urlaub in Ihrem Hotel gemacht, aber leider waren wir gar nicht zufrieden. Wir haben Ihr Hotel ausgesucht, (41) die Beschreibung auf Ihrer Webseite sehr gut klang. Dort steht: Die Zimmer sind groß und ruhig. (42) sie waren klein und laut! Außerdem hatten wir während des ganzen Wochenendes (43) warmes Wasser im Badezimmer. (44) haben wir uns natürlich sofort an der Rezeption beschwert.
+
+Wir haben uns sehr geärgert und möchten jetzt unser Geld (45). Bitte überweisen Sie es auf unser Konto.
+
+Mit freundlichen Grüßen
+Zhobin Rahbar`;
+  const part5SourceHtml = `<div class="exam-source"><h4>Beschwerde</h4><p>${escapeHtml(clozeText).replace(/\n/g, "<br>")}</p></div>`;
+  const part5 = [
+    ["(40) ... Frau und ich haben am letzten Wochenende Urlaub gemacht.", ["ihre", "meine", "seine"], "meine"],
+    ["(41) Wir haben Ihr Hotel gewählt, ... die Beschreibung gut klang.", ["dass", "denn", "weil"], "weil"],
+    ["(42) ... die Zimmer waren klein und laut.", ["Aber", "Jedoch", "Obwohl"], "Aber"],
+    ["(43) Wir hatten ... warmes Wasser.", ["kein", "leider", "nicht"], "kein"],
+    ["(44) ... haben wir uns beschwert.", ["Deshalb", "Obwohl", "Weil"], "Deshalb"],
+    ["(45) Wir möchten unser Geld ...", ["haben", "wechseln", "zurück"], "zurück"],
+  ].map(([prompt, options, answer]) => ({ kind: "reading-cloze", part: "Lesen Teil 5", prompt, options, answer }));
+
+  return [
+    { title: "Lesen Teil 1", time: "45 Minuten Lesen", instruction: "Sie sind im Rathaus und suchen Informationen. In welches Stockwerk gehen Sie?", sourceHtml: guideHtml, questions: part1 },
+    { title: "Lesen Teil 2", time: "45 Minuten Lesen", instruction: "Lesen Sie die Situationen und die Anzeigen a-h. Für eine Aufgabe gibt es keine Lösung. Markieren Sie dann x.", sourceHtml: adHtml, questions: part2 },
+    { title: "Lesen Teil 3", time: "45 Minuten Lesen", instruction: "Lesen Sie drei Texte. Zu jedem Text gibt es zwei Aufgaben: richtig/falsch und a, b oder c.", questions: part3 },
+    { title: "Lesen Teil 4", time: "45 Minuten Lesen", instruction: "Lesen Sie den Text. Entscheiden Sie, ob die Aussagen richtig oder falsch sind.", sourceHtml: part4SourceHtml, questions: part4 },
+    { title: "Lesen Teil 5", time: "45 Minuten Lesen", instruction: "Lesen Sie den Text und schließen Sie die Lücken. Welche Lösung a, b oder c passt am besten?", sourceHtml: part5SourceHtml, questions: part5 },
+  ];
+}
+
+function buildDtzExam(examNumber) {
+  const listeningSections = buildDtzListeningSections(examNumber);
+  const readingSections = buildDtzReadingSections(examNumber);
+  const writing = dtzWritingSets[(examNumber - 1) % dtzWritingSets.length];
+  const planning = dtzPlanningTasks[(examNumber - 1) % dtzPlanningTasks.length];
+  const picture = choice(pictureTasks, examNumber / 30);
+  return {
+    number: examNumber,
+    listeningSections,
+    readingSections,
+    listening: listeningSections.flatMap((section) => section.questions),
+    reading: readingSections.flatMap((section) => section.questions),
+    writing,
+    speaking: { picture, planning },
+    startedAt: Date.now(),
+    duration: 100 * 60,
+  };
+}
+
+function renderDtzExamSections(sections, startNumber, label) {
+  let questionNumber = startNumber;
+  return sections.map((section) => {
+    return `
+      <div class="exam-section">
+        <div class="exam-paper-header"><strong>${escapeHtml(section.title)}</strong><span>${escapeHtml(section.time)}</span></div>
+        <p class="muted">${escapeHtml(section.instruction)}</p>
+        ${section.sourceHtml || ""}
+        ${section.questions.map((item) => renderDtzExamQuestion(item, questionNumber++, label)).join("")}
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDtzExamQuestion(item, number, label) {
+  const audio = item.audio ? `
+    <div class="audio-card">
+      <div>
+        <strong>Hördialog ${number}</strong>
+        <span class="pill">einzeln abspielbar</span>
+      </div>
+      <p class="muted">Hören Sie diese Aufgabe separat.</p>
+      <div class="actions">
+        <button class="secondary" type="button" data-play="${escapeHtml(item.audio)}">Hördialog ${number} abspielen</button>
+        <button class="ghost" type="button" data-stop-audio="true">Audio stoppen</button>
+      </div>
+    </div>
+  ` : "";
+  const source = item.sourceText ? `<div class="exam-source compact"><strong>${escapeHtml(item.sourceTitle || "")}</strong><p>${escapeHtml(item.sourceText)}</p></div>` : "";
+  const typeLabel = item.kind?.includes("tf") ? "richtig/falsch" : item.kind?.includes("match") ? "zuordnen" : "a/b/c";
+  return `
+    <div class="exam-question">
+      <p><strong>${number}. ${escapeHtml(item.prompt)}</strong> <span class="pill">${label}</span><span class="pill">${typeLabel}</span></p>
+      ${audio}${source}
+      <div class="option-list exam-options">
+        ${item.options.map((option, optionIndex) => `
+          <label class="option">
+            <input type="radio" name="q${number}" value="${escapeHtml(option)}">
+            <span class="abc-option">${String.fromCharCode(97 + optionIndex)}</span> ${escapeHtml(option)}
+          </label>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderDtzWriting(writing) {
+  const renderTask = (letter, title, situation, points) => `
+    <label class="exam-writing-choice">
+      <input type="radio" name="writingChoice" value="${letter}" ${letter === "A" ? "checked" : ""}>
+      <div>
+        <h4>${escapeHtml(title)}</h4>
+        <p>${escapeHtml(situation)}</p>
+        <p><strong>Schreiben Sie etwas zu folgenden Punkten:</strong></p>
+        <ul>${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
+      </div>
+    </label>
+  `;
+  return `
+    <div class="exam-section">
+      <div class="exam-paper-header"><strong>Schreiben</strong><span>30 Minuten</span></div>
+      <p class="muted">Wählen Sie Aufgabe A oder Aufgabe B. Vergessen Sie nicht die Anrede und den Gruß. Schreiben Sie möglichst viel.</p>
+      <div class="split">
+        ${renderTask("A", writing.aTitle, writing.aSituation, writing.aPoints)}
+        ${renderTask("B", writing.bTitle, writing.bSituation, writing.bPoints)}
+      </div>
+      <textarea name="writing" placeholder="Schreiben Sie Ihren Brief oder Ihre E-Mail hier."></textarea>
+    </div>
+  `;
+}
+
+function renderDtzSpeaking(speaking) {
+  const picture = speaking.picture;
+  const planning = speaking.planning;
+  return `
+    <div class="exam-section">
+      <div class="exam-paper-header"><strong>Sprechen</strong><span>ca. 16 Minuten</span></div>
+      <div class="exam-question">
+        <h4>Teil 1: Sich vorstellen</h4>
+        <p class="muted">Name, Herkunft, Wohnort, Familie, Beruf, Deutschkurs, Hobbys und Ziel.</p>
+      </div>
+      <div class="exam-question">
+        <h4>Teil 2: Über Erfahrungen sprechen</h4>
+        <div class="photo-card">
+          <img src="${escapeHtml(picture.image)}" alt="${escapeHtml(picture.title)}">
+          <div class="body">
+            <strong>${escapeHtml(picture.title)}</strong>
+            <p>Was sehen Sie auf dem Foto? Was für eine Situation zeigt das Bild? Welche Erfahrungen haben Sie damit?</p>
+          </div>
+        </div>
+      </div>
+      <div class="exam-question">
+        <h4>Teil 3: Gemeinsam etwas planen</h4>
+        <p>${escapeHtml(planning.situation)}</p>
+        <div class="exam-note-card">
+          <strong>${escapeHtml(planning.title)}</strong>
+          <ul>${planning.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDtzExams() {
+  if (!state.exam) {
+    return `
+      <section class="grid">
+        <div class="card span-7">
+          <h2>30 DTZ-Modelltests</h2>
+          <p class="muted">Der Aufbau folgt jetzt dem Schema Ihrer Vorlagen: Hören Teil 1-4, Lesen Teil 1-5, Schreiben Aufgabe A/B und Sprechen Teil 1-3.</p>
+          <label>Prüfung auswählen<select id="examNumber">${Array.from({ length: 30 }, (_, i) => `<option value="${i + 1}">Modelltest ${i + 1}</option>`).join("")}</select></label>
+          <div class="actions">
+            <button class="primary" id="startExam" type="button">Prüfung starten</button>
+            <button class="secondary" id="startRandomExam" type="button">Zufällige Prüfung starten</button>
+          </div>
+        </div>
+        <div class="card span-5">
+          <h3>Prüfungsaufbau</h3>
+          <ul>
+            <li>Hören: 20 Aufgaben, ca. 25 Minuten.</li>
+            <li>Lesen: 25 Aufgaben, ca. 45 Minuten.</li>
+            <li>Schreiben: Aufgabe A oder B, 30 Minuten.</li>
+            <li>Sprechen: Vorstellung, Foto/Erfahrung, gemeinsam planen.</li>
+          </ul>
+        </div>
+        <div class="card span-12">${sourceNote()}</div>
+      </section>
+    `;
+  }
+  const exam = state.exam;
+  return `
+    <section class="grid">
+      <div class="card span-12">
+        <div class="metric"><h2>DTZ-Modelltest ${exam.number}</h2><span class="timer" id="examTimer">${formatTime(remainingExamSeconds())}</span></div>
+        <p class="muted">Bearbeiten Sie die Aufgaben wie auf dem Antwortbogen. Am Ende sehen Sie richtige und falsche Antworten.</p>
+        <div class="actions">
+          <button class="secondary" id="playAllListening" type="button">Alle Hördialoge nacheinander abspielen</button>
+          <button class="ghost" id="stopExamAudio" type="button">Audio stoppen</button>
+          <button class="danger" id="cancelExam" type="button">Prüfung verlassen</button>
+        </div>
+      </div>
+      <form id="examForm" class="card span-12">
+        ${renderDtzExamSections(exam.listeningSections, 1, "hören")}
+        ${renderDtzExamSections(exam.readingSections, 21, "lesen")}
+        ${renderDtzWriting(exam.writing)}
+        ${renderDtzSpeaking(exam.speaking)}
+        <div class="actions">
+          <button class="primary" type="submit">Prüfung abgeben</button>
+        </div>
+      </form>
+    </section>
+  `;
+}
+
+function gradeDtzExam(formData) {
+  const questions = [...state.exam.listening, ...state.exam.reading];
+  let points = 0;
+  const rows = questions.map((item, index) => {
+    const number = index < state.exam.listening.length ? index + 1 : index + 1;
+    const answer = formData.get(`q${number}`) || "";
+    const correct = normalize(answer) === normalize(item.answer);
+    if (correct) points += 1;
+    return `<tr><td>${number}</td><td>${escapeHtml(item.part || "")}</td><td>${correct ? "richtig" : "falsch"}</td><td>${escapeHtml(answer || "-")}</td><td>${escapeHtml(item.answer)}</td></tr>`;
+  });
+  const writingHtml = analyzeLetterText(formData.get("writing") || "");
+  const result = { exam: state.exam.number, points, at: new Date().toISOString() };
+  progress.examResults.push(result);
+  saveProgress();
+  clearInterval(state.examTimer);
+  state.exam = null;
+  showModal(`
+    <h3>Prüfung ausgewertet</h3>
+    <p><strong>Hören + Lesen: ${points}/45 Punkte.</strong> ${points >= 33 ? "B1-Bereich erreicht." : "Weiter üben; Ziel für B1 sind 33 Punkte."}</p>
+    ${writingHtml}
+    <table class="table"><thead><tr><th>Nr.</th><th>Teil</th><th>Status</th><th>Ihre Antwort</th><th>Richtig</th></tr></thead><tbody>${rows.join("")}</tbody></table>
+  `);
+  render();
+}
+
+buildExam = buildDtzExam;
+renderExams = renderDtzExams;
+gradeExam = gradeDtzExam;
 
 function renderLid() {
   if (!state.lidQuiz) {

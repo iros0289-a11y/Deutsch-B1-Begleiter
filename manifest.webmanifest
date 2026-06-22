@@ -1,9 +1,9 @@
 {
   "name": "Deutsch B1 Begleiter",
   "short_name": "Deutsch B1",
-  "description": "Lern-App fuer Integrationskurs, DTZ B1 und Leben in Deutschland.",
-  "id": "/Deutsch-B1-Begleiter/?app=deutsch-b1-begleiter-20260622-dtz-fix",
-  "start_url": "./?app=deutsch-b1-begleiter-20260622-dtz-fix",
+  "description": "Lern-App für Integrationskurs, DTZ B1 und Leben in Deutschland.",
+  "id": "/Deutsch-B1-Begleiter/?app=deutsch-b1-begleiter-20260622-dtz-schema",
+  "start_url": "./?app=deutsch-b1-begleiter-20260622-dtz-schema",
   "scope": "./",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "display": "standalone",

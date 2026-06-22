@@ -427,6 +427,110 @@ textarea {
   margin-top: 14px;
 }
 
+.exam-section {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.exam-paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  background: #e8ece9;
+  color: #25312e;
+  padding: 10px 12px;
+  font-weight: 850;
+}
+
+.exam-paper-header span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.exam-source {
+  border: 1px solid #cfd8d4;
+  border-radius: 8px;
+  background: #f3f5f2;
+  padding: 14px;
+}
+
+.exam-source.compact {
+  background: #fbfcfa;
+  padding: 10px 12px;
+}
+
+.exam-source h4,
+.exam-source p {
+  margin-bottom: 8px;
+}
+
+.exam-ad-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.exam-ad-grid article {
+  border: 1px solid #aebbb6;
+  border-radius: 8px;
+  background: #fbfbf8;
+  padding: 12px;
+}
+
+.exam-options .option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.abc-option {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eef4f2;
+  color: var(--brand-dark);
+  font-weight: 850;
+}
+
+.exam-writing-choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 14px;
+}
+
+.exam-writing-choice input {
+  width: auto;
+  margin-top: 4px;
+}
+
+.exam-note-card {
+  max-width: 560px;
+  border-radius: 8px;
+  background: #fff2b8;
+  border: 1px solid #edd575;
+  box-shadow: 0 14px 28px rgba(141, 116, 28, 0.14);
+  padding: 18px;
+}
+
+.exam-note-card ul {
+  margin-bottom: 0;
+}
+
 .audio-card {
   display: grid;
   gap: 8px;
@@ -505,8 +609,14 @@ textarea {
 
   .grid,
   .split,
-  .photo-grid {
+  .photo-grid,
+  .exam-ad-grid {
     grid-template-columns: 1fr;
+  }
+
+  .exam-paper-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .card.span-3,
