@@ -7,8 +7,8 @@
     <meta name="description" content="PWA zum Deutschlernen fuer den Integrationskurs, DTZ B1 und Leben in Deutschland.">
     <title>Deutsch B1 Begleiter</title>
     <link rel="manifest" href="./manifest.webmanifest">
-    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="./assets/icon-192.png">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -34,7 +34,25 @@
         </section>
       </div>
     </template>
-
-    <script src="./app.js" defer></script>
+    <script>
+      (function loadApp() {
+        var script = document.createElement("script");
+        script.src = "./app.js";
+        script.defer = true;
+        script.onerror = function () {
+          var fallback = document.createElement("script");
+          fallback.src = "./app[1].js";
+          fallback.defer = true;
+          fallback.onerror = function () {
+            var app = document.getElementById("app");
+            if (app) {
+              app.innerHTML = '<section class="card"><h2>Die App-Datei fehlt.</h2><p>Bitte laden Sie die Datei <strong>app.js</strong> in GitHub hoch. Sie darf nicht app[1].js oder anders heißen.</p></section>';
+            }
+          };
+          document.body.appendChild(fallback);
+        };
+        document.body.appendChild(script);
+      })();
+    </script>
   </body>
 </html>

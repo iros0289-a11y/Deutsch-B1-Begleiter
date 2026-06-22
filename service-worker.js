@@ -1,13 +1,13 @@
-const CACHE_NAME = "deutsch-b1-begleiter-v3";
+const CACHE_NAME = "deutsch-b1-begleiter-v4";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
-  "./app.js",
   "./manifest.webmanifest",
-  "./assets/icon.svg",
-  "./assets/icon-192.png",
-  "./assets/icon-512.png"
+  "./service-worker.js",
+  "./icon.svg",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
