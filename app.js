@@ -1346,9 +1346,42 @@ function analyzeSpeechText(text, keywords = [], expectedText = "") {
   `;
 }
 
+function uniqueOptions(options) {
+  return [...new Set(options.filter((option) => String(option ?? "").trim()))];
+}
+
+function examOrderOptions(item) {
+  const answer = item.answer || (item.pieces || []).join(" ");
+  const words = answer.split(" ").filter(Boolean);
+  if (words.length < 3) return [answer];
+  const variants = [
+    answer,
+    [...words.slice(1), words[0]].join(" "),
+    [words[0], ...words.slice(2), words[1]].join(" "),
+    [...words].reverse().join(" "),
+  ];
+  return uniqueOptions(variants).slice(0, 4);
+}
+
+function normalizeExamItem(item) {
+  const answer = item.answer || "";
+  let options = Array.isArray(item.options) ? item.options : [];
+  if (!options.length && item.type === "order") {
+    options = examOrderOptions(item);
+  }
+  if (!options.length && answer) {
+    options = [answer, "richtig", "falsch"];
+  }
+  return {
+    ...item,
+    answer,
+    options: shuffle(uniqueOptions([answer, ...options])).slice(0, 4),
+  };
+}
+
 function buildExam(examNumber) {
-  const listening = shuffle(exerciseBank.filter((item) => item.skill === "listening")).slice(0, 20);
-  const reading = shuffle(exerciseBank.filter((item) => ["reading", "sentence", "cases", "verbs"].includes(item.skill))).slice(0, 25);
+  const listening = shuffle(exerciseBank.filter((item) => item.skill === "listening")).slice(0, 20).map(normalizeExamItem);
+  const reading = shuffle(exerciseBank.filter((item) => ["reading", "sentence", "cases", "verbs"].includes(item.skill))).slice(0, 25).map(normalizeExamItem);
   const writing = letterPrompts[(examNumber - 1) % letterPrompts.length];
   const speaking = [speakingTasks[0], choice(pictureTasks, examNumber / 30), { title: "Gemeinsam planen", prompt: "Planen Sie mit einer anderen Person eine kleine Feier im Kurs: Termin, Ort, Essen, Aufgaben.", tr: "Kurs için küçük bir kutlamayı planlayın." }];
   return { number: examNumber, listening, reading, writing, speaking, startedAt: Date.now(), duration: 100 * 60 };
